@@ -46,7 +46,7 @@ if (isset($_GET['delete_id'])) {
     <div class="content" id="pageContent">
       <div class="main-wrapper">
         <div class="topbar">
-          <h1>Admin Managementtt</h1>
+          <h1>Admin Management</h1>
           <div class="right">
             <div class="theme-toggler">
               <span class="material-symbols-outlined active">wb_sunny</span>
