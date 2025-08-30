@@ -12,7 +12,6 @@ if ($conn->connect_error) {
 }
 
 // Handle Delete Request
-// Handle Delete Request
 if (isset($_GET['delete_id'])) {
     $delete_id = intval($_GET['delete_id']);
     $stmt = $conn->prepare("DELETE FROM login WHERE admin_id = ?");
@@ -44,30 +43,58 @@ if (isset($_GET['delete_id'])) {
     <?php include '../Navbar/navbar.php'; ?>
 
     <div class="content" id="pageContent">
-      <div class="main-wrapper">
-        <div class="topbar">
-          <h1>Admin Management</h1>
-          <div class="right">
-            <div class="theme-toggler">
-              <span class="material-symbols-outlined active">wb_sunny</span>
-              <span class="material-symbols-outlined">dark_mode</span>
-            </div>
-            <div class="profile">
-              <div class="info">
-                 <p>Hey, <b><?php echo isset($_SESSION['first_name']) ? htmlspecialchars($_SESSION['first_name']) : 'Admin'; ?></b></p>
-                <small class="text-muted">Admin</small>
-              </div>
-              <div class="profile-photo">
-                <img src="../Images/avatar.svg">
-              </div>
-            </div>
+      <div class="page-header">
+        <div class="page-title">
+          <h2>Admin List</h2>
+          <p>Manage all registered admins here</p>
+        </div>
+        <div class="page-actions">
+          <button class="export-btn">Export CSV</button>
+          <button class="add-btn" id="openModal"> Add Admin</button>
+        </div>
+      </div>
+
+      <div class="cards-wrapper">
+        <div class="card">
+          <div class="card-icon" style="background:#ffe2e2; color:#ff6b6b;">
+            <span class="material-symbols-outlined">analytics</span>
+          </div>
+          <div class="card-content">
+            <h3>Register Students</h3>
+            <p class="card-number">10</p>
+            <small>Last 24 Hours</small>
           </div>
         </div>
+
+    <div class="card">
+      <div class="card-icon" style="background:#e2f7e6; color:#2ecc71;">
+        <span class="material-symbols-outlined">lock</span>
+      </div>
+      <div class="card-content">
+        <h3>Claimed Items</h3>
+        <p class="card-number">20</p>
+        <small>Last 24 Hours</small>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon" style="background:#e2f0ff; color:#3498db;">
+        <span class="material-symbols-outlined">mail</span>
+      </div>
+      <div class="card-content">
+        <h3>Responded Message</h3>
+        <p class="card-number">10</p>
+        <small>Last 24 Hours</small>
+      </div>
+    </div>
+
+  </div>
+
 
         
         <?php
         // -----------------------------
-        // Handle Add Admin (fixed)
+        // Handle Add Admin
         // -----------------------------
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['__add_admin'])) {
             $last_name   = trim($_POST['last_name'] ?? '');
@@ -82,18 +109,20 @@ if (isset($_GET['delete_id'])) {
             if ($last_name !== '' && $faculty_id !== '' && $email !== '' && $username !== '' && $password !== '') {
                 $hash = password_hash($password, PASSWORD_DEFAULT);
 
-                // IMPORTANT: include password column in INSERT and match placeholders
+                $role = $_POST['role'] ?? 'user'; // default user if not set
+
                 $stmt = $conn->prepare("
                     INSERT INTO login
-                    (last_name, first_name, middle_name, faculty_id, email, username, `password`, status, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, 'inactive', NOW())
+                    (last_name, first_name, middle_name, faculty_id, email, username, role, `password`, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
                 ");
+                $stmt->bind_param("ssssssss", $last_name, $first_name, $middle_name, $faculty_id, $email, $username, $role, $hash);
+
 
                 if (!$stmt) {
                     echo "<div class='alert error'>Prepare failed: " . htmlspecialchars($conn->error) . "</div>";
                 } else {
-                    // 7 placeholders -> 7 types/variables
-                    $stmt->bind_param("sssssss", $last_name, $first_name, $middle_name, $faculty_id, $email, $username, $hash);
+                    $stmt->bind_param("ssssssss", $last_name, $first_name, $middle_name, $faculty_id, $email, $username, $role, $hash);
 
                     if ($stmt->execute()) {
                         $stmt->close();
@@ -118,47 +147,43 @@ if (isset($_GET['delete_id'])) {
             $faculty_id  = trim($_POST['faculty_id'] ?? '');
             $email  = trim($_POST['email'] ?? '');
             $username = trim($_POST['username'] ?? '');
+            $role       = $_POST['role'] ?? 'user'; // 
             $password   = $_POST['password'] ?? '';
 
             if ($id && $last_name && $first_name && $faculty_id && $email && $username) {
-        if (!empty($password)) {
-            $hash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("
-                UPDATE login 
-                SET last_name=?, first_name=?, middle_name=?, faculty_id=?, email=?, username=?, password=? 
-                WHERE admin_id=?
-            ");
-            $stmt->bind_param("sssssssi", $last_name, $first_name, $middle_name, $faculty_id, $email, $username, $hash, $id);
-        } else {
-            $stmt = $conn->prepare("
-                UPDATE login 
-                SET last_name=?, first_name=?, middle_name=?, faculty_id=?, email=?, username=? 
-                WHERE admin_id=?
-            ");
-            $stmt->bind_param("ssssssi", $last_name, $first_name, $middle_name, $faculty_id, $email, $username, $id);
+                if (!empty($password)) {
+                    $hash = password_hash($password, PASSWORD_DEFAULT);
+                    $stmt = $conn->prepare("
+                        UPDATE login 
+                        SET last_name=?, first_name=?, middle_name=?, faculty_id=?, email=?, username=?, role=?, password=? 
+                        WHERE admin_id=?
+                    ");
+                    $stmt->bind_param("ssssssi", $last_name, $first_name, $middle_name, $faculty_id, $email, $username, $role, $hash, $id);
+                } else {
+                    $stmt = $conn->prepare("
+                        UPDATE login 
+                        SET last_name=?, first_name=?, middle_name=?, faculty_id=?, email=?, username=?, role=?
+                        WHERE admin_id=?
+                    ");
+                    $stmt->bind_param("sssssssi", $last_name, $first_name, $middle_name, $faculty_id, $email, $username, $role, $id);
+                }
+
+                if ($stmt->execute()) {
+                    header("Location: adminlist.php?updated=1");
+                    exit;
+                } else {
+                    echo "<div class='alert error'>Update failed: " . htmlspecialchars($stmt->error) . "</div>";
+                }
+                $stmt->close();
+            } else {
+                echo "<div class='alert error'>Please fill all required fields.</div>";
+            }
         }
 
-        if ($stmt->execute()) {
-            header("Location: adminlist.php?updated=1");
-            exit;
-        } else {
-            echo "<div class='alert error'>Update failed: " . htmlspecialchars($stmt->error) . "</div>";
-        }
-        $stmt->close();
-    } else {
-        echo "<div class='alert error'>Please fill all required fields.</div>";
-    }
-}
-
-        // Fetch Admins
-        $sql = "SELECT admin_id, last_name, first_name, middle_name, faculty_id, email, username, COALESCE(status,'inactive') AS status, created_at 
+        // Fetch Admins (use role instead of status)
+        $sql = "SELECT admin_id, last_name, first_name, middle_name, faculty_id, email, username, role, created_at 
                 FROM login ORDER BY admin_id DESC";
         $result = $conn->query($sql);
-
-        echo "<div class='header'>";
-        echo "<h2>Admin List</h2>";
-        echo "<button class='add-btn' id='openModal'> Add Admin</button>";
-        echo "</div>";
 
         if ($result && $result->num_rows > 0) {
           echo "<table>";
@@ -170,13 +195,13 @@ if (isset($_GET['delete_id'])) {
                   <th>Faculty ID</th>
                   <th>Email</th>
                   <th>Username</th>
-                  <th>Status</th>
+                  <th>Role</th>
                   <th>Created At</th>
                   <th>Actions</th>
                 </tr>";
           $result = $conn->query("SELECT * FROM login ORDER BY admin_id ASC");
           while ($row = $result->fetch_assoc()) {
-            $statusClass = ($row['status'] === 'active') ? "status-active" : "status-inactive";
+            $roleClass = ($row['role'] === 'active') ? "status-active" : "status-inactive";
             $name = preg_replace("/[\r\n]+/", " ", $row['last_name']);
 
             echo "<tr>";
@@ -187,23 +212,24 @@ if (isset($_GET['delete_id'])) {
             echo "<td>".htmlspecialchars($row['faculty_id'])."</td>";
             echo "<td>".htmlspecialchars($row['email'])."</td>";
             echo "<td>".htmlspecialchars($row['username'])."</td>";
-            echo "<td><span class='$statusClass'>".ucfirst($row['status'])."</span></td>";
+            echo "<td><span class='$roleClass'>".ucfirst($row['role'])."</span></td>";
             echo "<td>".htmlspecialchars($row['created_at'])."</td>";
-      echo "<td class='actions'>";
-      echo "<button class='edit-btn'"
-        . " data-id='" . htmlspecialchars($row['admin_id']) . "'"
-        . " data-last-name='" . htmlspecialchars($row['last_name']) . "'"
-        . " data-first-name='" . htmlspecialchars($row['first_name']) . "'"
-        . " data-middle-name='" . htmlspecialchars($row['middle_name']) . "'"
-        . " data-faculty-id='" . htmlspecialchars($row['faculty_id'] ?? '') . "'"
-        . " data-email='" . htmlspecialchars($row['email'] ?? '') . "'"
-        . " data-username='" . htmlspecialchars($row['username']) . "'>Edit</button>";
-      echo "<form method='GET' action='adminlist.php' style='display:inline;'>";
-      echo "<input type='hidden' name='delete_id' value='" . htmlspecialchars($row['admin_id']) . "' />";
-      echo "<button type='submit' class='delete-btn' onclick='return confirm(\"Are you sure you want to delete this admin?\");'>Delete</button>";
-      echo "</form>";
-      echo "</td>";
-            echo "</tr>";
+            echo "<td class='actions'>";
+            echo "<button class='edit-btn'"
+          . " data-id='" . htmlspecialchars($row['admin_id']) . "'"
+          . " data-last-name='" . htmlspecialchars($row['last_name']) . "'"
+          . " data-first-name='" . htmlspecialchars($row['first_name']) . "'"
+          . " data-middle-name='" . htmlspecialchars($row['middle_name']) . "'"
+          . " data-faculty-id='" . htmlspecialchars($row['faculty_id'] ?? '') . "'"
+          . " data-email='" . htmlspecialchars($row['email'] ?? '') . "'"
+          . " data-username='" . htmlspecialchars($row['username']) . "'"
+          . " data-role='" . htmlspecialchars($row['role']) . "'>Edit</button>";
+
+            echo "<form method='GET' action='adminlist.php' style='display:inline;' class='delete-form'>";
+            echo "<input type='hidden' name='delete_id' value='" . htmlspecialchars($row['admin_id']) . "' />";
+            echo "<button type='button' class='delete-btn'>Delete</button>";
+            echo "</form>";
+
           }
 
           echo "</table>";
@@ -220,7 +246,7 @@ if (isset($_GET['delete_id'])) {
    <!--  ADD MODAL POPUP -->
   <div class="modal" id="addAdminModal">
     <div class="modal-content">
-      <h2>Add Admin</h2>
+      <h2>Add User</h2>
       <form action="" method="POST" autocomplete="on">
         <input type="hidden" name="__add_admin" value="1">
         <input type="text" name="last_name" placeholder="Last Name" required>
@@ -229,6 +255,12 @@ if (isset($_GET['delete_id'])) {
         <input type="text" name="faculty_id" placeholder="Faculty ID" required>
         <input type="email" name="email" placeholder="Email" required>
         <input type="text" name="username" placeholder="Username" required>
+         <label for="role">Role:</label>
+      <select name="role" id="role" required>
+        <option value="" disabled selected>Select role</option>
+        <option value="admin">Admin</option>
+        <option value="user">User</option>
+      </select>
         <input type="password" name="password" placeholder="Password" required>
         <button type="submit">Save</button>
         <button type="button" class="close-btn" id="closeModal">Cancel</button>
@@ -248,6 +280,14 @@ if (isset($_GET['delete_id'])) {
         <input type="text" name="faculty_id" id="edit_faculty_id" placeholder="Faculty ID" required>
         <input type="email" name="email" id="edit_email" placeholder="Email" required>
         <input type="text" name="username" id="edit_username" placeholder="Username" required>
+
+          <label for="edit_role">Role:</label>
+        <select name="role" id="edit_role" required>
+          <option value="admin">Admin</option>
+          <option value="user">User</option>
+        </select>
+
+
         <input type="password" name="password" id="edit_password" placeholder="New Password (leave blank if unchanged)">
         <button type="submit">Update</button>
         <button type="button" class="close-btn" id="closeEditModal">Cancel</button>
@@ -256,5 +296,7 @@ if (isset($_GET['delete_id'])) {
   </div>
 
   <script src="../AdminList/adminlist.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </body>
 </html>

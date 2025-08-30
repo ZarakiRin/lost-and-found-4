@@ -56,14 +56,9 @@ $current_page = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
                 <h3>Returned Items</h3>
             </a>
 
-            <a href="../Userlist/userlist.php" class="<?= $current_page === 'userlist.php' ? 'active' : '' ?>">
-                <span class="material-symbols-outlined">group</span>
-                <h3>User List</h3>
-            </a>
-
             <a href="../Adminlist/adminlist.php" class="<?= $current_page === 'adminlist.php' ? 'active' : '' ?>">
                 <span class="material-symbols-outlined">admin_panel_settings</span>
-                <h3>Admin List</h3>
+                <h3>User List</h3>
             </a>
 
             <a href="../Messages/message.php" class="<?= $current_page === 'message.php' ? 'active' : '' ?>">

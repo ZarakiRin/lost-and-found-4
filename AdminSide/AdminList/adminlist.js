@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const closeBtn = document.getElementById("closeModal");
     const pageContent = document.getElementById("pageContent");
 
-    // ✅ADD MODAL
+    // ✅ ADD MODAL
     openBtn.onclick = function () {
         modal.style.display = "flex";
         pageContent.classList.add("blurred");
@@ -15,14 +15,14 @@ document.addEventListener("DOMContentLoaded", function () {
         pageContent.classList.remove("blurred");
     };
 
-    // EDIT form 2
+    // ✅ EDIT form
     const editModal = document.getElementById("editAdminModal"); 
     const closeEditBtn = document.getElementById("closeEditModal");
 
-    // eto edit buttons
+    // All edit buttons
     document.querySelectorAll(".edit-btn").forEach(btn => {
         btn.addEventListener("click", function () {
-           document.getElementById("edit_admin_id").value = this.dataset.id;
+            document.getElementById("edit_admin_id").value = this.dataset.id;
             document.getElementById("edit_last_name").value = this.dataset.lastName;
             document.getElementById("edit_first_name").value = this.dataset.firstName;
             document.getElementById("edit_middle_name").value = this.dataset.middleName;
@@ -30,6 +30,8 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("edit_email").value = this.dataset.email;
             document.getElementById("edit_username").value = this.dataset.username;
 
+            // ✅ New: role instead of status
+            document.getElementById("edit_role").value = this.dataset.role;
 
             editModal.style.display = "flex";
             pageContent.classList.add("blurred");
@@ -41,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
         pageContent.classList.remove("blurred");
     };
 
-    // Close modals btn
+    // ✅ Close modals when clicking outside
     window.onclick = function (event) {
         if (event.target === modal) {
             modal.style.display = "none";
@@ -52,11 +54,24 @@ document.addEventListener("DOMContentLoaded", function () {
             pageContent.classList.remove("blurred");
         }
     };
+});
 
-
-
-  
- 
-  
-
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".delete-btn").forEach(button => {
+    button.addEventListener("click", function() {
+      let form = this.closest("form");
+      Swal.fire({
+        title: "Are you sure?",
+        text: "This admin will be deleted permanently.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "Cancel"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          form.submit();
+        }
+      });
+    });
+  });
 });
