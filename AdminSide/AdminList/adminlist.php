@@ -242,7 +242,7 @@ if (isset($_GET['delete_id'])) {
    <!--  ADD MODAL POPUP -->
   <div class="modal" id="addAdminModal">
     <div class="modal-content">
-      <h2>Add User</h2>
+      <h2>Add Userr</h2>
       <form action="" method="POST" autocomplete="on">
         <input type="hidden" name="__add_admin" value="1">
         <input type="text" name="last_name" placeholder="Last Name" required>
