@@ -87,11 +87,7 @@ if (isset($_GET['delete_id'])) {
         <small>Last 24 Hours</small>
       </div>
     </div>
-
   </div>
-
-
-        
         <?php
         // -----------------------------
         // Handle Add Admin
