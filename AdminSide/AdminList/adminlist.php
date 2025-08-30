@@ -1,4 +1,6 @@
 <?php
+session_start();
+ob_start();
 
 // DB connect BEFORE delete handling
 $host = "localhost";
@@ -118,12 +120,11 @@ if (isset($_GET['delete_id'])) {
                 if (!$stmt) {
                     echo "<div class='alert error'>Prepare failed: " . htmlspecialchars($conn->error) . "</div>";
                 } else {
-                    $stmt->bind_param("ssssssss", $last_name, $first_name, $middle_name, $faculty_id, $email, $username, $role, $hash);
-
                     if ($stmt->execute()) {
                         $stmt->close();
+                        $_SESSION['message'] = "Admin added successfully.";
                         header("Location: adminlist.php?added=1");
-                        exit;
+                        exit();
                     } else {
                         echo "<div class='alert error'>Insert failed: " . htmlspecialchars($stmt->error) . "</div>";
                         $stmt->close();
@@ -182,6 +183,7 @@ if (isset($_GET['delete_id'])) {
         $result = $conn->query($sql);
 
         if ($result && $result->num_rows > 0) {
+          echo "<div class='table-container'>";
           echo "<table>";
           echo "<tr>
                   <th>ID</th>
@@ -195,7 +197,6 @@ if (isset($_GET['delete_id'])) {
                   <th>Created At</th>
                   <th>Actions</th>
                 </tr>";
-          $result = $conn->query("SELECT * FROM login ORDER BY admin_id ASC");
           while ($row = $result->fetch_assoc()) {
             $roleClass = ($row['role'] === 'active') ? "status-active" : "status-inactive";
             $name = preg_replace("/[\r\n]+/", " ", $row['last_name']);
@@ -225,12 +226,14 @@ if (isset($_GET['delete_id'])) {
             echo "<input type='hidden' name='delete_id' value='" . htmlspecialchars($row['admin_id']) . "' />";
             echo "<button type='button' class='delete-btn'>Delete</button>";
             echo "</form>";
-
+            echo "</td>"; // Close actions cell
+            echo "</tr>"; // Close row
           }
 
           echo "</table>";
+          echo "</div>"; // Close table-container
         } else {
-          echo "<h3>No admins found.</h3>";
+          echo "<div class='table-container'><h3>No admins found.</h3></div>";
         }
 
         $conn->close();
