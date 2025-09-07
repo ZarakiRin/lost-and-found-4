@@ -1,0 +1,12 @@
+# Composer vendor folder
+/vendor
+
+# Composer lock files (optional kung ayaw mo i-track)
+composer.lock
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
