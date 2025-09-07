@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($isValid) {
             $_SESSION['admin_id']   = $user['admin_id'];
             $_SESSION['first_name'] = $user['first_name'];
-            header("Location: ../DashBoard/dashboard.php");
+            header("Location: /AdminSide/DashBoard/dashboard.php");
             exit();
         }
     }
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login</title>
 
-  <link rel="stylesheet" href="../Login/login.css"/>
+  <link rel="stylesheet" href="/AdminSide/Login/login.css"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
@@ -61,12 +61,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="card">
     <div class="container">
       <div class="img">
-        <img src="../Images/LOGO.png" alt="Logo">
+        <img src="/AdminSide/Images/LOGO.png" alt="Logo">
       </div>
 
       <div class="login-content">
         <form action="" method="POST">
-          <img src="../Images/avatar.svg" alt="Avatar"/>
+          <img src="/AdminSide/Images/avatar.svg" alt="Avatar"/>
           <h2 class="title">WELCOME</h2>
 
           <?php
@@ -97,13 +97,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="showPassword">Show Password</label>
           </div>
 
-          <a href="../forgotpass/resetpass.php">Forgot Password?</a>
+          <a href="/AdminSide/forgotpass/resetpass.php">Forgot Password?</a>
           <input type="submit" class="btn" value="Login"/>
         </form>
       </div>
     </div>
   </div>
 
-  <script src="../Login/login.js"></script>
+  <script src="/AdminSide/Login/login.js"></script>
 </body>
 </html>
