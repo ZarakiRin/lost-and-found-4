@@ -8,7 +8,7 @@ $adminFirstName = isset($_SESSION['admin_firstname']) ? $_SESSION['admin_firstna
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../DashBoard/dashboard.css">
+    <link rel="stylesheet" href="/AdminSide/DashBoard/dashboard.css">
     <link rel="stylesheet" href="../Navbar/navbar.css">
    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <title>Home</title>
