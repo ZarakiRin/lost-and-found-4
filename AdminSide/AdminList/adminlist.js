@@ -1,10 +1,44 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // Search and Filter Functionality
+    const searchInput = document.getElementById("searchInput");
+    const roleFilter = document.getElementById("roleFilter");
+    const tableRows = document.querySelectorAll("table tr:not(:first-child)");
+
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedRole = roleFilter.value.toLowerCase();
+
+        tableRows.forEach(row => {
+            const lastName = row.children[1].textContent.toLowerCase();
+            const firstName = row.children[2].textContent.toLowerCase();
+            const middleName = row.children[3].textContent.toLowerCase();
+            const facultyId = row.children[4].textContent.toLowerCase();
+            const email = row.children[5].textContent.toLowerCase();
+            const username = row.children[6].textContent.toLowerCase();
+            const role = row.children[7].textContent.toLowerCase();
+
+            const matchesSearch = lastName.includes(searchTerm) || 
+                                firstName.includes(searchTerm) || 
+                                middleName.includes(searchTerm) || 
+                                facultyId.includes(searchTerm) || 
+                                email.includes(searchTerm) || 
+                                username.includes(searchTerm);
+            
+            const matchesRole = selectedRole === "" || role.includes(selectedRole);
+
+            row.style.display = matchesSearch && matchesRole ? "" : "none";
+        });
+    }
+
+    searchInput.addEventListener("input", filterTable);
+    roleFilter.addEventListener("change", filterTable);
+
     const modal = document.getElementById("addAdminModal");
     const openBtn = document.getElementById("openModal");
     const closeBtn = document.getElementById("closeModal");
     const pageContent = document.getElementById("pageContent");
 
-    // ✅ ADD MODAL
+   
     openBtn.onclick = function () {
         modal.style.display = "flex";
         pageContent.classList.add("blurred");
@@ -15,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
         pageContent.classList.remove("blurred");
     };
 
-    // ✅ EDIT form
+    //  EDIT form
     const editModal = document.getElementById("editAdminModal"); 
     const closeEditBtn = document.getElementById("closeEditModal");
 

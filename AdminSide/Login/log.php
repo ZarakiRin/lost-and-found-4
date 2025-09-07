@@ -34,7 +34,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         // Set error message in a session variable
         $_SESSION['login_error'] = "Incorrect username or password."; 
         // Redirect back to the login page
-        header("location: login.php"); 
+        header("location: index.php"); 
         exit();
 
     }
