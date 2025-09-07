@@ -56,40 +56,78 @@ if (isset($_GET['delete_id'])) {
         </div>
       </div>
 
+      <?php
+        // Get counts from database
+        $totalUsers = $conn->query("SELECT COUNT(*) as count FROM login")->fetch_assoc()['count'];
+        $adminCount = $conn->query("SELECT COUNT(*) as count FROM login WHERE role = 'admin'")->fetch_assoc()['count'];
+        // Debug query to see what roles exist
+        $roleQuery = $conn->query("SELECT DISTINCT role FROM login");
+        $roles = [];
+        while($row = $roleQuery->fetch_assoc()) {
+            $roles[] = $row['role'];
+        }
+        error_log("Available roles: " . print_r($roles, true));
+        
+        // Updated query to count students (checking both 'user' and 'Student')
+        $studentCount = $conn->query("SELECT COUNT(*) as count FROM login WHERE LOWER(role) IN ('user', 'student')")->fetch_assoc()['count'];
+        $totalCount = $totalUsers; // Total of all users in the database
+      ?>
       <div class="cards-wrapper">
-        <div class="card">
+        <div class="card" style="background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);">
           <div class="card-icon" style="background:#ffe2e2; color:#ff6b6b;">
-            <span class="material-symbols-outlined">analytics</span>
+            <span class="material-symbols-outlined">group</span>
           </div>
           <div class="card-content">
-            <h3>Register Students</h3>
-            <p class="card-number">10</p>
-            <small>Last 24 Hours</small>
+            <h3>Total Users</h3>
+            <p class="card-number"><?php echo number_format($totalUsers); ?></p>
           </div>
         </div>
 
-    <div class="card">
-      <div class="card-icon" style="background:#e2f7e6; color:#2ecc71;">
-        <span class="material-symbols-outlined">lock</span>
-      </div>
-      <div class="card-content">
-        <h3>Claimed Items</h3>
-        <p class="card-number">20</p>
-        <small>Last 24 Hours</small>
-      </div>
-    </div>
+        <div class="card" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);">
+          <div class="card-icon" style="background:#e2f7e6; color:#2ecc71;">
+            <span class="material-symbols-outlined">admin_panel_settings</span>
+          </div>
+          <div class="card-content">
+            <h3>Total Admins</h3>
+            <p class="card-number"><?php echo number_format($adminCount); ?></p>
+          </div>
+        </div>
 
-    <div class="card">
-      <div class="card-icon" style="background:#e2f0ff; color:#3498db;">
-        <span class="material-symbols-outlined">mail</span>
+        <div class="card" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);">
+          <div class="card-icon" style="background:#e2f0ff; color:#3498db;">
+            <span class="material-symbols-outlined">school</span>
+          </div>
+          <div class="card-content">
+            <h3>Total Students</h3>
+            <p class="card-number"><?php echo number_format($studentCount); ?></p>
+          </div>
+        </div>
       </div>
-      <div class="card-content">
-        <h3>Responded Message</h3>
-        <p class="card-number">10</p>
-        <small>Last 24 Hours</small>
+
+      <div class="section-divider"></div>
+      
+      <div class="all-customers-header">
+        <div class="customers-total">
+          <h3>All List</h3>
+          <p class="total-number"><?php echo number_format($totalCount); ?></p>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="search-filter-section">
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search users...">
+            <span class="material-symbols-outlined">search</span>
+          </div>
+          <div class="filter-options">
+            <select id="roleFilter">
+              <option value="">All Roles</option>
+              <option value="admin">Admin</option>
+              <option value="student">Student</option>
+            </select>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
+
         <?php
         // -----------------------------
         // Handle Add Admin
@@ -107,7 +145,7 @@ if (isset($_GET['delete_id'])) {
             if ($last_name !== '' && $faculty_id !== '' && $email !== '' && $username !== '' && $password !== '') {
                 $hash = password_hash($password, PASSWORD_DEFAULT);
 
-                $role = $_POST['role'] ?? 'user'; // default user if not set
+                $role = $_POST['role'] ?? 'N/A'; // default user if not set
 
                 $stmt = $conn->prepare("
                     INSERT INTO login
@@ -177,9 +215,9 @@ if (isset($_GET['delete_id'])) {
             }
         }
 
-        // Fetch Admins (use role instead of status)
-        $sql = "SELECT admin_id, last_name, first_name, middle_name, faculty_id, email, username, role, created_at 
-                FROM login ORDER BY admin_id DESC";
+        
+        $sql = "SELECT admin_id, last_name, first_name, middle_name, faculty_id, email, username, role 
+                FROM login ORDER BY admin_id ASC";
         $result = $conn->query($sql);
 
         if ($result && $result->num_rows > 0) {
@@ -194,7 +232,6 @@ if (isset($_GET['delete_id'])) {
                   <th>Email</th>
                   <th>Username</th>
                   <th>Role</th>
-                  <th>Created At</th>
                   <th>Actions</th>
                 </tr>";
           while ($row = $result->fetch_assoc()) {
@@ -210,7 +247,6 @@ if (isset($_GET['delete_id'])) {
             echo "<td>".htmlspecialchars($row['email'])."</td>";
             echo "<td>".htmlspecialchars($row['username'])."</td>";
             echo "<td><span class='$roleClass'>".ucfirst($row['role'])."</span></td>";
-            echo "<td>".htmlspecialchars($row['created_at'])."</td>";
             echo "<td class='actions'>";
             echo "<button class='edit-btn'"
           . " data-id='" . htmlspecialchars($row['admin_id']) . "'"
@@ -258,7 +294,7 @@ if (isset($_GET['delete_id'])) {
       <select name="role" id="role" required>
         <option value="" disabled selected>Select role</option>
         <option value="admin">Admin</option>
-        <option value="user">User</option>
+        <option value="student">Student</option>
       </select>
         <input type="password" name="password" placeholder="Password" required>
         <button type="submit">Save</button>
@@ -283,7 +319,7 @@ if (isset($_GET['delete_id'])) {
           <label for="edit_role">Role:</label>
         <select name="role" id="edit_role" required>
           <option value="admin">Admin</option>
-          <option value="user">User</option>
+          <option value="student">Student</option>
         </select>
 
 

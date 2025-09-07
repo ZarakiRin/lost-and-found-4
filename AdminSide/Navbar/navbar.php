@@ -36,16 +36,11 @@ $current_page = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
                 <h3>Dashboard</h3>
             </a>
 
-            <a href="../ManageFound/found.php" class="<?= $current_page === 'found.php' ? 'active' : '' ?>">
+            <a href="../ManageLost/manage.php" class="<?= $current_page === 'manage.php' ? 'active' : '' ?>">
                 <span class="material-symbols-outlined">cases</span>
-                <h3>Manage Found Items</h3>
+                <h3>Manage Report Items</h3>
             </a>
-
-            <a href="../PageContent/lostreports/lostreports.php" class="<?= $current_page === 'lostreports.php' ? 'active' : '' ?>">
-                <span class="material-symbols-outlined">feature_search</span>
-                <h3>Manage Lost Reports</h3>
-            </a>
-
+          
             <a href="../PageContent/claimrequest/claimrequest.php" class="<?= $current_page === 'claimrequest.php' ? 'active' : '' ?>">
                 <span class="material-symbols-outlined">input</span>
                 <h3>Claim Request</h3>
@@ -57,7 +52,7 @@ $current_page = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
             </a>
 
             <a href="../Adminlist/adminlist.php" class="<?= $current_page === 'adminlist.php' ? 'active' : '' ?>">
-                <span class="material-symbols-outlined">admin_panel_settings</span>
+                <span class="material-symbols-outlined">accessibility</span>
                 <h3>User List</h3>
             </a>
 

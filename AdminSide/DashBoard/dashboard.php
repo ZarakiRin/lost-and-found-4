@@ -1,6 +1,4 @@
 
-
-
 <?php
 session_start();
 $adminFirstName = isset($_SESSION['admin_firstname']) ? $_SESSION['admin_firstname'] : 'Admin';
@@ -99,7 +97,7 @@ $adminFirstName = isset($_SESSION['admin_firstname']) ? $_SESSION['admin_firstna
                     <thead>
                         <tr>
                             <th>Item Name</th>
-                            <th>Report Number</th>
+                            <th>Report Id</th>
                             <th>Category</th>
                             <th>Status</th>
                             <th></th>
