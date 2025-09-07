@@ -41,7 +41,6 @@ if (isset($_GET['delete_id'])) {
 <body>
   <div class="container">
     <?php include '../Navbar/navbar.php'; ?>
-
     <div class="content" id="pageContent">
       <div class="page-header">
         <div class="page-title">
